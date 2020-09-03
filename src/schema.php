@@ -24,7 +24,10 @@ class Schema {
 	 */
 	public function init() {
 		add_filter( 'graphql_schema_config', array( $this, 'disable_mutations' ), 10, 1 );
-		add_filter( 'graphql_RootQuery_fields', array( $this, 'disable_queries' ), 10, 1 );
+
+		// Increase the priority to be more than 10 since WPGraphQL itself filters
+		// this at the default priority via register_graphql_object_type.
+		add_filter( 'graphql_RootQuery_fields', array( $this, 'disable_queries' ), 20, 1 );
 	}
 
 	/**

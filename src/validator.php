@@ -45,7 +45,7 @@ class Validator {
 
 	/**
 	 * We will allow ONE of these where args. All other where args (besides those
-	 * in whitelist) are completely disallowed.
+	 * in allowed list) are completely disallowed.
 	 *
 	 * @var array
 	 */
@@ -63,7 +63,10 @@ class Validator {
 	 *
 	 * @var array
 	 */
-	private $whitelisted_where_args = array();
+	private $allowed_where_args = array(
+		'id', // getting a resource by id.
+		'in', // getting multiple resources by id.
+	);
 
 	/**
 	 * Add hooks on graphql_init.
@@ -109,13 +112,13 @@ class Validator {
 	}
 
 	/**
-	 * Allow whitelisted and restricted where args to be amended.
+	 * Allow allowed and restricted where args to be amended.
 	 *
 	 * @return void
 	 */
 	public function amend_where_args() {
 		$this->restricted_where_args = apply_filters( 'graphql_restricted_where_args', $this->restricted_where_args );
-		$this->whitelisted_where_args = apply_filters( 'graphql_whitelisted_where_args', $this->whitelisted_where_args );
+		$this->allowed_where_args = apply_filters( 'graphql_allowed_where_args', $this->allowed_where_args );
 	}
 
 	/**
@@ -159,11 +162,12 @@ class Validator {
 			// Getting a resource by ID.
 			case 'id':
 			case 'mediaItemId':
+			case 'objectId':
 			case 'pageId':
 			case 'postId':
 				return 0;
 
-			// Getting a resource by a whitelisted property.
+			// Getting a resource by an allowed property.
 			case 'slug':
 			case 'uri':
 				return 0;
@@ -187,9 +191,9 @@ class Validator {
 	 * @return int
 	 */
 	private function calculate_where_cost( $arg_names ) {
-		// Remove whitelisted args from the array; we allow them to be combined
-		// with other where args at no cost.
-		$arg_names = array_values( array_diff( $arg_names, $this->whitelisted_where_args ) );
+		// Remove allowed args from the array; we allow them to be combined with
+		// other where args at no cost.
+		$arg_names = array_values( array_diff( $arg_names, $this->allowed_where_args ) );
 
 		// No remaining query args, no problem.
 		if ( 0 === count( $arg_names ) ) {

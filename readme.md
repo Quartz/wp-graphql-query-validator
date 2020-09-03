@@ -7,8 +7,8 @@ determine how you want to use query cost analysis.
 
 ## Approach
 
-This plugin works by creating a (filterable) whitelist of types and query arguments that
-are considered "safe" (or performant). If a query uses non-whitelisted types or query args,
+This plugin works by creating a (filterable) list of allowed types and query arguments that
+are considered "safe" (or performant). If a query uses non-allowed types or query args,
 it receives a disqualifying query cost (enforced by `graphql-php`).
 
 ## Tests
